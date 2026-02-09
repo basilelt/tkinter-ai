@@ -1,0 +1,13 @@
+Audio assets in this directory are sourced from Kenney.nl
+Licensed under Creative Commons CC0 (Public Domain)
+https://creativecommons.org/publicdomain/zero/1.0/
+
+Packs used:
+- Casino Audio (https://kenney.nl/assets/casino-audio)
+- Interface Sounds (https://kenney.nl/assets/interface-sounds)
+- Impact Sounds (https://kenney.nl/assets/impact-sounds)
+- RPG Audio (https://kenney.nl/assets/rpg-audio)
+- Digital Audio (https://kenney.nl/assets/digital-audio)
+- Music Jingles (https://kenney.nl/assets/music-jingles)
+
+No attribution required, but credit is appreciated.
