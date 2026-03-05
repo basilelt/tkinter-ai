@@ -1,0 +1,27 @@
+{
+  "name": "@silent-hillberg/client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 4173",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@silent-hillberg/protocol": "workspace:*",
+    "@silent-hillberg/shared": "workspace:*",
+    "socket.io-client": "^4.8.1",
+    "three": "^0.171.0",
+    "tone": "^15.1.22"
+  },
+  "devDependencies": {
+    "@types/three": "^0.171.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
+    "vitest": "^2.1.8"
+  }
+}

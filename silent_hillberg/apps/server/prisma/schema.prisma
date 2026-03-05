@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model PlayerProfile {
+  id                String   @id @default(cuid())
+  nickname          String
+  deviceFingerprint String   @unique
+  level             Int      @default(1)
+  xp                Int      @default(0)
+  unlockedWeaponIds Json
+  unlockedPerkIds   Json
+  equippedWeaponId  String   @default("rusty-rifle")
+  equippedPerkIds   Json
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  matchHistories    MatchHistory[]
+
+  @@index([xp(sort: Desc)])
+}
+
+model MatchHistory {
+  id          String   @id @default(cuid())
+  roomCode    String
+  success     Boolean
+  kills       Int
+  damageDone  Int
+  damageTaken Int
+  waveReached Int
+  xpGained    Int
+  createdAt   DateTime @default(now())
+
+  playerId    String
+  player      PlayerProfile @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@index([playerId, createdAt(sort: Desc)])
+}

@@ -1,0 +1,14 @@
+node_modules
+.pnpm-store
+.DS_Store
+dist
+coverage
+.vite
+*.log
+.env
+.env.*
+apps/server/generated
+apps/server/prisma/dev.db
+!package.json
+!tsconfig.json
+!tsconfig.base.json

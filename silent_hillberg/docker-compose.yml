@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: silent-hillberg-db
+    environment:
+      POSTGRES_DB: silent_hillberg
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d silent_hillberg"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    container_name: silent-hillberg-server
+    environment:
+      PORT: 3001
+      HOST: 0.0.0.0
+      CLIENT_ORIGIN: http://localhost:8080
+      JWT_SECRET: local-dev-secret
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/silent_hillberg
+      USE_IN_MEMORY_DB: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+
+  client:
+    build:
+      context: .
+      dockerfile: apps/client/Dockerfile
+    container_name: silent-hillberg-client
+    depends_on:
+      - server
+    ports:
+      - "8080:80"
+
+volumes:
+  postgres_data:

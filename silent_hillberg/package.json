@@ -1,0 +1,15 @@
+{
+  "name": "silent-hillberg",
+  "private": true,
+  "packageManager": "pnpm@10.14.0",
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter ./apps/* dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "db:generate": "pnpm --filter @silent-hillberg/server prisma:generate",
+    "db:migrate": "pnpm --filter @silent-hillberg/server prisma:migrate",
+    "db:seed": "pnpm --filter @silent-hillberg/server db:seed"
+  }
+}

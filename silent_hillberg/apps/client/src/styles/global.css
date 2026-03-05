@@ -1,0 +1,406 @@
+:root {
+  --fog-white: #e9edf2;
+  --steel: #202733;
+  --blood: #9f1f24;
+  --mist: rgba(230, 235, 241, 0.55);
+  --panel: rgba(9, 13, 20, 0.86);
+  --text: #f3f3f3;
+  --text-dim: #a9b0bb;
+  --ok: #62cf6b;
+  --warn: #f2b544;
+  --danger: #ff3b3f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: "Cinzel", "Trajan Pro", "Georgia", serif;
+  background: radial-gradient(circle at 50% 10%, #505863 0%, #131820 45%, #070b10 100%);
+  color: var(--text);
+}
+
+#game-root {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+#game-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+}
+
+.menu-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(180deg, rgba(3, 6, 10, 0.75) 0%, rgba(6, 8, 12, 0.94) 75%),
+    url("/assets/silent_hillberg.png") center / cover no-repeat;
+}
+
+.menu-panel {
+  width: min(92vw, 560px);
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 14px;
+  padding: 24px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42);
+}
+
+.title {
+  margin: 0 0 8px;
+  font-size: clamp(2rem, 4vw, 3rem);
+  letter-spacing: 0.2em;
+  color: #f4f5f8;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  margin: 0 0 20px;
+  color: var(--text-dim);
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+label {
+  display: block;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+input {
+  width: 100%;
+  background: rgba(5, 9, 16, 0.9);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 11px 12px;
+  font-size: 0.98rem;
+}
+
+input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.42);
+}
+
+button {
+  background: linear-gradient(160deg, #3a404c 0%, #232a36 100%);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 9px;
+  padding: 11px 14px;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: rgba(255, 255, 255, 0.56);
+}
+
+button.primary {
+  background: linear-gradient(160deg, #782428 0%, #48171a 100%);
+}
+
+.menu-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.status-line {
+  margin-top: 12px;
+  min-height: 20px;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  color: var(--warn);
+}
+
+.lobby-list {
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(1, 4, 9, 0.42);
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+}
+
+.lobby-player {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 3px 0;
+  font-size: 0.9rem;
+}
+
+.hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.crosshair {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+}
+
+.crosshair::before,
+.crosshair::after {
+  content: "";
+  position: absolute;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.crosshair::before {
+  width: 1px;
+  height: 20px;
+  left: 6px;
+  top: -3px;
+}
+
+.crosshair::after {
+  width: 20px;
+  height: 1px;
+  left: -3px;
+  top: 6px;
+}
+
+.hud-top {
+  position: absolute;
+  top: 18px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+}
+
+.wave-pill,
+.room-pill {
+  background: rgba(5, 8, 14, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  letter-spacing: 0.05em;
+}
+
+.hud-bottom {
+  position: absolute;
+  bottom: 20px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.player-card {
+  width: min(400px, 66vw);
+  background: rgba(3, 6, 12, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 10px;
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 12px;
+  padding: 10px;
+  pointer-events: auto;
+}
+
+.player-card img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+}
+
+.player-stats {
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  font-size: 0.9rem;
+}
+
+.bars {
+  display: grid;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.bar {
+  width: 100%;
+  height: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.bar-fill {
+  height: 100%;
+  width: 0;
+  transition: width 140ms linear;
+}
+
+.bar-fill.hp {
+  background: linear-gradient(90deg, #692126, #d84347);
+}
+
+.bar-fill.armor {
+  background: linear-gradient(90deg, #20314f, #4f8ad7);
+}
+
+.hud-right {
+  display: grid;
+  gap: 8px;
+  justify-items: end;
+}
+
+.ammo-card,
+.audio-card,
+.feed-card {
+  background: rgba(3, 7, 12, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  pointer-events: auto;
+}
+
+.audio-card {
+  min-width: 230px;
+}
+
+.audio-row {
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.feed-card {
+  width: min(320px, 48vw);
+  max-height: 140px;
+  overflow: auto;
+  font-size: 0.82rem;
+}
+
+.feed-line {
+  margin: 2px 0;
+  color: var(--mist);
+}
+
+.match-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 4, 8, 0.76);
+}
+
+.match-overlay.visible {
+  display: flex;
+}
+
+.match-panel {
+  width: min(92vw, 520px);
+  background: rgba(9, 12, 18, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.match-title {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.match-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  margin-top: 8px;
+}
+
+.match-table th,
+.match-table td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 7px;
+  text-align: left;
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.38) 100%);
+}
+
+.grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 0.5px, transparent 0.5px);
+  background-size: 3px 3px;
+  mix-blend-mode: soft-light;
+  opacity: 0.22;
+}
+
+@media (max-width: 860px) {
+  .menu-grid,
+  .menu-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .hud-bottom {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hud-right {
+    justify-items: stretch;
+  }
+
+  .player-card {
+    width: 100%;
+  }
+
+  .feed-card,
+  .audio-card {
+    width: 100%;
+  }
+}
