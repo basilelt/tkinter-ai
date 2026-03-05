@@ -184,7 +184,7 @@ export class SilentHillbergApp {
               <div class="player-stats">
                 <div>
                   <strong id="level-text">Lvl 1</strong>
-                  <span id="ammo-text" style="float:right">Ammo 0 / 0</span>
+                  <span id="ammo-text" style="float:right">Rusty Rifle · Ammo ∞</span>
                 </div>
                 <div class="bars">
                   <div>
@@ -474,7 +474,7 @@ export class SilentHillbergApp {
 
     this.hpText.textContent = `${Math.max(0, Math.floor(localPlayer.hp))}`;
     this.armorText.textContent = `${Math.max(0, Math.floor(localPlayer.armor))}`;
-    this.ammoText.textContent = `Ammo ${localPlayer.ammoPrimary} / ${localPlayer.ammoSecondary}`;
+    this.ammoText.textContent = "Rusty Rifle · Ammo ∞";
     this.levelText.textContent = `Lvl ${localPlayer.level}`;
 
     this.hpFill.style.width = `${Math.max(0, Math.min(100, localPlayer.hp))}%`;

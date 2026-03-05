@@ -1,4 +1,4 @@
-import { levelFromXp, UNLOCK_CATALOG, type PlayerProfile } from "@silent-hillberg/shared";
+import { levelFromXp, UNLOCK_CATALOG, type PlayerProfile, type WeaponId } from "@silent-hillberg/shared";
 
 export function createBaseProfile(playerId: string, nickname: string): PlayerProfile {
   const level = 1;
@@ -19,4 +19,16 @@ export function createBaseProfile(playerId: string, nickname: string): PlayerPro
 
 export function clampLevelFromXp(xp: number): number {
   return Math.max(1, levelFromXp(xp));
+}
+
+export function ensureDefaultWeapon(profile: PlayerProfile): PlayerProfile {
+  const defaultWeapon: WeaponId = "rusty-rifle";
+  const unlockedWeaponIds = profile.unlockedWeaponIds.length > 0 ? profile.unlockedWeaponIds : [defaultWeapon];
+  const equippedWeaponId = unlockedWeaponIds.includes(profile.equippedWeaponId) ? profile.equippedWeaponId : unlockedWeaponIds[0];
+
+  return {
+    ...profile,
+    unlockedWeaponIds,
+    equippedWeaponId
+  };
 }

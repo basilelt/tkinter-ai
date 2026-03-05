@@ -30,6 +30,7 @@ export class WorldRenderer {
   private readonly gunMesh: THREE.Mesh;
 
   private readonly remotePlayerMaterial: THREE.MeshBasicMaterial;
+  private frameIndex = 0;
 
   public constructor(private readonly canvas: HTMLCanvasElement) {
     this.scene = new THREE.Scene();
@@ -41,10 +42,10 @@ export class WorldRenderer {
 
     this.renderer = new THREE.WebGLRenderer({
       canvas,
-      antialias: true,
+      antialias: false,
       powerPreference: "high-performance"
     });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     this.renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -111,6 +112,8 @@ export class WorldRenderer {
   }
 
   public render(snapshot: GameSnapshot | null, localPlayerId: string | null): void {
+    this.frameIndex += 1;
+
     if (snapshot && localPlayerId) {
       this.syncPlayers(snapshot.players, localPlayerId);
       this.syncEnemies(snapshot.enemies);
@@ -125,12 +128,14 @@ export class WorldRenderer {
       }
     }
 
-    for (const mesh of this.remotePlayers.values()) {
-      mesh.lookAt(this.camera.position.x, mesh.position.y, this.camera.position.z);
-    }
+    if (this.frameIndex % 2 === 0) {
+      for (const mesh of this.remotePlayers.values()) {
+        mesh.lookAt(this.camera.position.x, mesh.position.y, this.camera.position.z);
+      }
 
-    for (const sprite of this.enemySprites.values()) {
-      sprite.lookAt(this.camera.position);
+      for (const sprite of this.enemySprites.values()) {
+        sprite.lookAt(this.camera.position);
+      }
     }
 
     this.renderer.render(this.scene, this.camera);
@@ -156,9 +161,15 @@ export class WorldRenderer {
     moon.position.set(8, 17, -5);
     this.scene.add(moon);
 
-    const fogLamp = new THREE.PointLight(0xeff5ff, 1.1, 28, 1.35);
-    fogLamp.position.set(0, 5.5, 15);
-    this.scene.add(fogLamp);
+    const keyFogLamps = [
+      new THREE.PointLight(0xdde7ff, 0.9, 24, 1.4),
+      new THREE.PointLight(0xbfd4ff, 0.8, 22, 1.5),
+      new THREE.PointLight(0xe3f0ff, 1, 20, 1.4)
+    ];
+    keyFogLamps[0].position.set(0, 5.5, 15);
+    keyFogLamps[1].position.set(-28, 4.2, -8);
+    keyFogLamps[2].position.set(30, 4.5, -10);
+    this.scene.add(...keyFogLamps);
 
     const floorTexture = this.textureLoader.load("/assets/scala_mayo.jpg");
     floorTexture.colorSpace = THREE.SRGBColorSpace;
@@ -179,22 +190,54 @@ export class WorldRenderer {
     ground.position.y = 0;
     this.scene.add(ground);
 
+    const pathMaterial = new THREE.MeshStandardMaterial({
+      color: 0x5d646f,
+      roughness: 0.95,
+      metalness: 0.03
+    });
+    const mainPath = new THREE.Mesh(new THREE.PlaneGeometry(26, 170), pathMaterial);
+    mainPath.rotation.x = -Math.PI / 2;
+    mainPath.position.set(0, 0.03, 12);
+    this.scene.add(mainPath);
+
+    const sidePathLeft = new THREE.Mesh(new THREE.PlaneGeometry(62, 14), pathMaterial);
+    sidePathLeft.rotation.x = -Math.PI / 2;
+    sidePathLeft.position.set(-32, 0.03, -8);
+    this.scene.add(sidePathLeft);
+
+    const sidePathRight = new THREE.Mesh(new THREE.PlaneGeometry(62, 14), pathMaterial);
+    sidePathRight.rotation.x = -Math.PI / 2;
+    sidePathRight.position.set(32, 0.03, -8);
+    this.scene.add(sidePathRight);
+
     const buildingMaterial = new THREE.MeshStandardMaterial({
       color: 0x272d38,
       roughness: 0.87,
       metalness: 0.08
     });
 
-    const wingA = new THREE.Mesh(new THREE.BoxGeometry(48, 14, 18), buildingMaterial);
+    const wingA = new THREE.Mesh(new THREE.BoxGeometry(50, 14, 20), buildingMaterial);
     wingA.position.set(-18, 7, -26);
 
-    const wingB = new THREE.Mesh(new THREE.BoxGeometry(44, 10, 16), buildingMaterial);
+    const wingB = new THREE.Mesh(new THREE.BoxGeometry(46, 10, 18), buildingMaterial);
     wingB.position.set(18, 5, -20);
 
-    const hall = new THREE.Mesh(new THREE.BoxGeometry(30, 9, 24), buildingMaterial);
-    hall.position.set(2, 4.5, -45);
+    const hall = new THREE.Mesh(new THREE.BoxGeometry(32, 9, 26), buildingMaterial);
+    hall.position.set(2, 4.5, -46);
 
-    this.scene.add(wingA, wingB, hall);
+    const entrance = new THREE.Mesh(
+      new THREE.BoxGeometry(18, 7.5, 9),
+      new THREE.MeshStandardMaterial({ color: 0x38404d, roughness: 0.8, metalness: 0.05 })
+    );
+    entrance.position.set(0, 3.8, -8);
+
+    const bridge = new THREE.Mesh(
+      new THREE.BoxGeometry(44, 2.6, 7),
+      new THREE.MeshStandardMaterial({ color: 0x2f3642, roughness: 0.72, metalness: 0.12 })
+    );
+    bridge.position.set(0, 11.6, -28);
+
+    this.scene.add(wingA, wingB, hall, entrance, bridge);
 
     const signTexture = this.textureLoader.load("/assets/silent_hillberg.png");
     signTexture.colorSpace = THREE.SRGBColorSpace;
@@ -215,15 +258,57 @@ export class WorldRenderer {
     infoBoard.rotation.y = Math.PI / 4;
     this.scene.add(infoBoard);
 
-    for (let index = 0; index < 12; index += 1) {
+    for (let index = 0; index < 16; index += 1) {
       const pole = new THREE.Mesh(
         new THREE.CylinderGeometry(0.12, 0.15, 2.7, 8),
         new THREE.MeshStandardMaterial({ color: 0x2d3139, roughness: 0.75 })
       );
-      const x = -42 + index * 7.6;
-      pole.position.set(x, 1.35, 18 + Math.sin(index * 0.6) * 2);
+      const x = -56 + index * 7.4;
+      pole.position.set(x, 1.35, 24 + Math.sin(index * 0.45) * 3);
       this.scene.add(pole);
     }
+
+    const blockerMaterial = new THREE.MeshStandardMaterial({ color: 0x2d3340, roughness: 0.9 });
+    for (let i = 0; i < 24; i += 1) {
+      const size = i % 3 === 0 ? 4 : 3;
+      const block = new THREE.Mesh(new THREE.BoxGeometry(size, 2 + (i % 2), size), blockerMaterial);
+      const lane = i % 2 === 0 ? -1 : 1;
+      const x = lane * (10 + (i % 5) * 7);
+      const z = 18 + Math.floor(i / 2) * 8;
+      block.position.set(x, 1 + (i % 2) * 0.5, z);
+      this.scene.add(block);
+    }
+
+    const courtyardMaterial = new THREE.MeshStandardMaterial({
+      color: 0x454c58,
+      roughness: 0.86,
+      metalness: 0.06
+    });
+    const courtyard = new THREE.Mesh(new THREE.CircleGeometry(16, 40), courtyardMaterial);
+    courtyard.rotation.x = -Math.PI / 2;
+    courtyard.position.set(0, 0.04, 40);
+    this.scene.add(courtyard);
+
+    const monument = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.2, 1.6, 4.8, 10),
+      new THREE.MeshStandardMaterial({ color: 0x737c8a, roughness: 0.62, metalness: 0.16 })
+    );
+    monument.position.set(0, 2.4, 40);
+    this.scene.add(monument);
+
+    const fenceMaterial = new THREE.MeshStandardMaterial({ color: 0x2a3039, roughness: 0.7, metalness: 0.2 });
+    for (let i = 0; i < 22; i += 1) {
+      const postL = new THREE.Mesh(new THREE.BoxGeometry(0.25, 2.1, 0.25), fenceMaterial);
+      const postR = new THREE.Mesh(new THREE.BoxGeometry(0.25, 2.1, 0.25), fenceMaterial);
+      const z = -62 + i * 6;
+      postL.position.set(-64, 1.05, z);
+      postR.position.set(64, 1.05, z);
+      this.scene.add(postL, postR);
+    }
+
+    const extractionBeacon = new THREE.PointLight(0x78ff8d, 1.4, 26, 1.25);
+    extractionBeacon.position.set(0, 4.5, 58);
+    this.scene.add(extractionBeacon);
   }
 
   private syncPlayers(players: NetPlayerState[], localPlayerId: string): void {

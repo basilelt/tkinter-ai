@@ -1,9 +1,9 @@
 import type { EnemyArchetype, UnlockCatalog } from "./types";
 
 export const GAME_TICK_RATE = 30;
-export const SNAPSHOT_RATE = 15;
+export const SNAPSHOT_RATE = 10;
 export const MAX_PLAYERS_PER_ROOM = 4;
-export const MAX_ACTIVE_ENEMIES = 80;
+export const MAX_ACTIVE_ENEMIES = 42;
 export const ROOM_CODE_LENGTH = 6;
 
 export const WORLD_BOUNDS = {
@@ -29,20 +29,20 @@ export const PLAYER_DEFAULTS = {
   primaryDamage: 18,
   primaryHeadshotMultiplier: 1.85,
   primaryRange: 45,
-  primaryAmmoMax: 30,
+  primaryAmmoMax: 999,
   primaryFireIntervalMs: 120,
   reloadDurationMs: 1500,
   secondaryDamage: 35,
-  secondaryAmmoMax: 6,
+  secondaryAmmoMax: 999,
   secondaryFireIntervalMs: 900,
   projectileSpeed: 26
 } as const;
 
 export const WAVE_CONFIG = {
-  baseEnemies: 8,
-  enemiesPerWaveGrowth: 3,
-  interWaveDelayMs: 3500,
-  extractionWave: 4,
+  baseEnemies: 6,
+  enemiesPerWaveGrowth: 2,
+  interWaveDelayMs: 3000,
+  extractionWave: 3,
   extractionRequiredMs: 8500
 } as const;
 

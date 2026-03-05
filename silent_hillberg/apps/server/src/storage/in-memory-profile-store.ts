@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { PerkId, PlayerProfile, WeaponId } from "@silent-hillberg/shared";
 import type { LeaderboardEntry, MatchHistoryEntry, ProfileStore } from "./profile-store";
-import { createBaseProfile } from "./utils";
+import { createBaseProfile, ensureDefaultWeapon } from "./utils";
 
 export class InMemoryProfileStore implements ProfileStore {
   private readonly profilesById = new Map<string, PlayerProfile>();
@@ -19,7 +19,7 @@ export class InMemoryProfileStore implements ProfileStore {
           nickname
         };
         this.profilesById.set(updated.playerId, updated);
-        return updated;
+        return ensureDefaultWeapon(updated);
       }
     }
 
@@ -29,11 +29,12 @@ export class InMemoryProfileStore implements ProfileStore {
     this.profilesById.set(profile.playerId, profile);
     this.profileIdByFingerprint.set(deviceFingerprint, profile.playerId);
 
-    return profile;
+    return ensureDefaultWeapon(profile);
   }
 
   public async getById(playerId: string): Promise<PlayerProfile | null> {
-    return this.profilesById.get(playerId) ?? null;
+    const profile = this.profilesById.get(playerId) ?? null;
+    return profile ? ensureDefaultWeapon(profile) : null;
   }
 
   public async updateLoadout(
@@ -53,12 +54,12 @@ export class InMemoryProfileStore implements ProfileStore {
     };
 
     this.profilesById.set(playerId, updated);
-    return updated;
+    return ensureDefaultWeapon(updated);
   }
 
   public async saveProfile(profile: PlayerProfile): Promise<PlayerProfile> {
     this.profilesById.set(profile.playerId, profile);
-    return profile;
+    return ensureDefaultWeapon(profile);
   }
 
   public async getLeaderboard(limit = 20): Promise<LeaderboardEntry[]> {

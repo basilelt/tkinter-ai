@@ -43,12 +43,13 @@ Service web:
 ## Contrôles
 
 - `WASD`: déplacement
+- `ZQSD` (AZERTY): déplacement
 - `Shift`: sprint
 - `Space`: saut
-- `Q`: dash
+- `E` ou `C`: dash
 - `Click gauche`: tir principal hitscan
 - `Click droit`: projectile secondaire
-- `R`: reload
+- `R`: reload (inutile en mode munitions infinies)
 
 ## API publique
 

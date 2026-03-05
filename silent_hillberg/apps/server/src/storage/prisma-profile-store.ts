@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { type PerkId, type PlayerProfile, type WeaponId } from "@silent-hillberg/shared";
 import type { LeaderboardEntry, MatchHistoryEntry, ProfileStore } from "./profile-store";
-import { createBaseProfile } from "./utils";
+import { createBaseProfile, ensureDefaultWeapon } from "./utils";
 
 function toProfile(record: {
   id: string;
@@ -13,7 +13,7 @@ function toProfile(record: {
   equippedWeaponId: string;
   equippedPerkIds: unknown;
 }): PlayerProfile {
-  return {
+  return ensureDefaultWeapon({
     playerId: record.id,
     nickname: record.nickname,
     level: record.level,
@@ -22,7 +22,7 @@ function toProfile(record: {
     unlockedPerkIds: (record.unlockedPerkIds as PerkId[]) ?? [],
     equippedWeaponId: record.equippedWeaponId as WeaponId,
     equippedPerkIds: (record.equippedPerkIds as PerkId[]) ?? []
-  };
+  });
 }
 
 export class PrismaProfileStore implements ProfileStore {

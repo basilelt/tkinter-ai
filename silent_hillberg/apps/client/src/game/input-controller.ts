@@ -134,25 +134,33 @@ export class InputController {
 
     switch (event.code) {
       case "KeyW":
+      case "KeyZ":
         this.state.forward = pressed;
+        event.preventDefault();
         break;
       case "KeyS":
         this.state.backward = pressed;
+        event.preventDefault();
         break;
       case "KeyA":
+      case "KeyQ":
         this.state.left = pressed;
+        event.preventDefault();
         break;
       case "KeyD":
         this.state.right = pressed;
+        event.preventDefault();
         break;
       case "Space":
         this.state.jump = pressed;
+        event.preventDefault();
         break;
       case "ShiftLeft":
       case "ShiftRight":
         this.state.sprint = pressed;
         break;
-      case "KeyQ":
+      case "KeyE":
+      case "KeyC":
         this.state.dash = pressed;
         break;
       case "KeyR":

@@ -41,6 +41,22 @@ async function requireAuthenticatedProfile(
 }
 
 export async function registerHttpRoutes(app: FastifyInstance, profileStore: ProfileStore): Promise<void> {
+  app.get("/", async () => ({
+    service: "silent-hillberg-server",
+    ok: true,
+    docs: {
+      health: "/health",
+      authGuest: "/api/auth/guest",
+      profileMe: "/api/profile/me",
+      unlockCatalog: "/api/unlocks/catalog",
+      leaderboard: "/api/leaderboard"
+    }
+  }));
+
+  app.get("/favicon.ico", async (_request, reply) => {
+    reply.status(204).send();
+  });
+
   app.get("/health", async () => ({ ok: true, service: "silent-hillberg-server" }));
 
   app.post("/api/auth/guest", async (request, reply) => {

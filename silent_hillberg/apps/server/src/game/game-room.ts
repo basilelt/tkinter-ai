@@ -481,28 +481,17 @@ export class GameRoom {
 
       state.sprinting = input.sprint;
 
-      if (state.isReloading && nowMs >= runtime.reloadEndAtMs) {
-        state.isReloading = false;
-        state.ammoPrimary = PLAYER_DEFAULTS.primaryAmmoMax;
-        this.emitGameEvent("reload", {
-          playerId: state.id
-        });
-      }
+      state.isReloading = false;
+      state.ammoPrimary = PLAYER_DEFAULTS.primaryAmmoMax;
+      state.ammoSecondary = PLAYER_DEFAULTS.secondaryAmmoMax;
 
-      if (!state.isReloading && (input.reload || state.ammoPrimary === 0)) {
-        state.isReloading = true;
-        runtime.reloadEndAtMs = nowMs + PLAYER_DEFAULTS.reloadDurationMs;
-      }
-
-      if (input.firePrimary && !state.isReloading && nowMs >= runtime.nextPrimaryAtMs && state.ammoPrimary > 0) {
+      if (input.firePrimary && nowMs >= runtime.nextPrimaryAtMs) {
         runtime.nextPrimaryAtMs = nowMs + PLAYER_DEFAULTS.primaryFireIntervalMs;
-        state.ammoPrimary -= 1;
         this.handlePrimaryShot(runtime, nowMs);
       }
 
-      if (input.fireSecondary && nowMs >= runtime.nextSecondaryAtMs && state.ammoSecondary > 0) {
+      if (input.fireSecondary && nowMs >= runtime.nextSecondaryAtMs) {
         runtime.nextSecondaryAtMs = nowMs + PLAYER_DEFAULTS.secondaryFireIntervalMs;
-        state.ammoSecondary -= 1;
         this.spawnProjectile(runtime);
       }
     }
@@ -696,10 +685,6 @@ export class GameRoom {
         setTimeout(() => {
           pickup.active = true;
         }, 9000);
-        this.emitGameEvent("hit", {
-          playerId: player.state.id,
-          pickup: pickup.kind
-        });
       }
     }
 
@@ -940,14 +925,6 @@ export class GameRoom {
     enemy.hp -= damage;
     attacker.stats.damageDone += damage;
 
-    this.emitGameEvent("hit", {
-      source,
-      playerId: attacker.state.id,
-      enemyId: enemy.id,
-      damage,
-      critical
-    });
-
     if (enemy.hp <= 0) {
       enemy.hp = 0;
       enemy.alive = false;
@@ -978,13 +955,6 @@ export class GameRoom {
 
     target.state.hp -= remaining;
     target.stats.damageTaken += remaining;
-
-    this.emitGameEvent("damage", {
-      playerId: target.state.id,
-      enemyId,
-      damage: remaining,
-      hp: Math.max(0, target.state.hp)
-    });
 
     if (target.state.hp <= 0) {
       target.state.hp = 0;
